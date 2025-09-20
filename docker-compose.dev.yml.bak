@@ -1,0 +1,125 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14
+    container_name: garazzo_postgres_dev
+    environment:
+      POSTGRES_DB: garazzo_dev
+      POSTGRES_USER: garazzo_dev
+      POSTGRES_PASSWORD: development
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    networks:
+      - garazzo_dev_network
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:6
+    container_name: garazzo_mongodb_dev
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: garazzo_dev
+      MONGO_INITDB_ROOT_PASSWORD: development
+      MONGO_INITDB_DATABASE: garazzo_dev
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_dev_data:/data/db
+    networks:
+      - garazzo_dev_network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: garazzo_redis_dev
+    command: redis-server --requirepass development
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - garazzo_dev_network
+
+  # MQTT Broker
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: garazzo_mqtt_dev
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mqtt/config:/mosquitto/config
+      - mqtt_dev_data:/mosquitto/data
+      - mqtt_dev_logs:/mosquitto/log
+    networks:
+      - garazzo_dev_network
+    healthcheck:
+      test: ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: garazzo_backend_dev
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./backend/.env.development
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - mongodb
+      - redis
+      - mqtt
+    networks:
+      - garazzo_dev_network
+
+  # Web Application
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile.dev
+    container_name: garazzo_web_dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:3001
+      - REACT_APP_SOCKET_URL=http://localhost:3001
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - WDS_SOCKET_PORT=0
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    depends_on:
+      - backend
+    networks:
+      - garazzo_dev_network
+
+networks:
+  garazzo_dev_network:
+    driver: bridge
+
+volumes:
+  postgres_dev_data:
+  mongodb_dev_data:
+  redis_dev_data:
+  mqtt_dev_data:
+  mqtt_dev_logs:

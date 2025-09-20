@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14
+    container_name: garazzo_postgres
+    environment:
+      POSTGRES_DB: garazzo
+      POSTGRES_USER: garazzo_user
+      POSTGRES_PASSWORD: garazzo_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - garazzo_network
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:6
+    container_name: garazzo_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: garazzo_admin
+      MONGO_INITDB_ROOT_PASSWORD: garazzo_password
+      MONGO_INITDB_DATABASE: garazzo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - garazzo_network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: garazzo_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - garazzo_network
+
+  # MQTT Broker
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: garazzo_mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mqtt/config:/mosquitto/config
+      - mqtt_data:/mosquitto/data
+      - mqtt_logs:/mosquitto/log
+    networks:
+      - garazzo_network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: garazzo_backend
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://garazzo_user:garazzo_password@postgres:5432/garazzo
+      - MONGODB_URI=mongodb://garazzo_admin:garazzo_password@mongodb:27017/garazzo?authSource=admin
+      - REDIS_URL=redis://redis:6379
+      - MQTT_BROKER_URL=mqtt://mqtt:1883
+    depends_on:
+      - postgres
+      - mongodb
+      - redis
+      - mqtt
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - garazzo_network
+
+  # Web Application
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: garazzo_web
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:3001
+      - REACT_APP_SOCKET_URL=http://localhost:3001
+    depends_on:
+      - backend
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    networks:
+      - garazzo_network
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+  mqtt_data:
+  mqtt_logs:
+
+networks:
+  garazzo_network:
+    driver: bridge

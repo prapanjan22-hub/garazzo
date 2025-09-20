@@ -1,0 +1,36 @@
+{
+  "name": "garazzo-platform",
+  "version": "1.0.0",
+  "description": "Comprehensive car service platform connecting car owners with mechanics",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run web:dev\"",
+    "backend:dev": "cd backend && npm run dev",
+    "web:dev": "cd web && npm start",
+    "mobile:android": "cd mobile && npm run android",
+    "mobile:ios": "cd mobile && npm run ios",
+    "install:all": "npm install && cd backend && npm install && cd ../web && npm install && cd ../mobile && npm install",
+    "build": "cd backend && npm run build && cd ../web && npm run build",
+    "test": "cd backend && npm test && cd ../web && npm test",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "keywords": [
+    "car-service",
+    "mechanic-booking",
+    "vehicle-monitoring",
+    "iot",
+    "react-native",
+    "nodejs",
+    "mongodb",
+    "postgresql"
+  ],
+  "author": "Garazzo Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "node-cache": "^5.1.2"
+  }
+}
