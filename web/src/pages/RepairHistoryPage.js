@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const RepairHistoryPage = () => {
@@ -8,8 +8,8 @@ const RepairHistoryPage = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Mock repair history data
-  const mockRepairHistory = [
+  // FIXED: Use useMemo to prevent mockRepairHistory from being recreated on every render
+  const mockRepairHistory = useMemo(() => [
     {
       id: 'RH001',
       date: '2025-09-15',
@@ -64,9 +64,8 @@ const RepairHistoryPage = () => {
       technician: 'Vikram Patel',
       duration: 'Ongoing'
     }
-  ];
+  ], []); // Empty dependency array since this data is static
 
-  // ONLY CHANGE: Added mockRepairHistory to dependency array
   useEffect(() => {
     const loadHistory = async () => {
       setLoading(true);
@@ -76,7 +75,7 @@ const RepairHistoryPage = () => {
     };
     
     loadHistory();
-  }, [mockRepairHistory]); // ✅ FIXED: Added dependency
+  }, [mockRepairHistory]); // Now safe because mockRepairHistory is memoized
 
   const filteredHistory = repairHistory.filter(record => {
     const matchesSearch = record.serviceProvider.toLowerCase().includes(searchQuery.toLowerCase()) ||
