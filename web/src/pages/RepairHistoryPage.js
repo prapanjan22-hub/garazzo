@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const RepairHistoryPage = () => {
@@ -66,8 +66,8 @@ const RepairHistoryPage = () => {
     }
   ];
 
+  // ONLY CHANGE: Added mockRepairHistory to dependency array
   useEffect(() => {
-    // Simulate API call
     const loadHistory = async () => {
       setLoading(true);
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -76,7 +76,7 @@ const RepairHistoryPage = () => {
     };
     
     loadHistory();
-  }, []);
+  }, [mockRepairHistory]); // ✅ FIXED: Added dependency
 
   const filteredHistory = repairHistory.filter(record => {
     const matchesSearch = record.serviceProvider.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -125,7 +125,6 @@ const RepairHistoryPage = () => {
           <h1>Vehicle Repair History</h1>
           <p>Complete service records and maintenance history</p>
         </div>
-
         <div className="header-stats">
           <div className="stat-item">
             <span className="stat-number">{repairHistory.filter(r => r.status === 'completed').length}</span>
@@ -155,7 +154,6 @@ const RepairHistoryPage = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-
         <div className="filter-tabs">
           {[
             { key: 'all', label: 'All Records' },
@@ -304,7 +302,6 @@ const RepairHistoryPage = () => {
           background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-
         .page-header {
           background: white;
           border-bottom: 1px solid #e2e8f0;
@@ -316,7 +313,6 @@ const RepairHistoryPage = () => {
           top: 0;
           z-index: 100;
         }
-
         .back-button {
           background: none;
           border: none;
@@ -326,52 +322,43 @@ const RepairHistoryPage = () => {
           color: #64748b;
           transition: all 0.2s;
         }
-
         .back-button:hover {
           background: #f8fafc;
           color: #334155;
         }
-
         .header-content {
           flex: 1;
         }
-
         .header-content h1 {
           margin: 0 0 5px 0;
           font-size: 1.75rem;
           font-weight: 700;
           color: #1e293b;
         }
-
         .header-content p {
           margin: 0;
           color: #64748b;
           font-size: 1rem;
         }
-
         .header-stats {
           display: flex;
           gap: 30px;
         }
-
         .stat-item {
           text-align: center;
         }
-
         .stat-number {
           display: block;
           font-size: 1.5rem;
           font-weight: 700;
           color: #1e293b;
         }
-
         .stat-label {
           font-size: 0.8rem;
           color: #64748b;
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
-
         .controls-section {
           background: white;
           padding: 20px 25px;
@@ -382,13 +369,11 @@ const RepairHistoryPage = () => {
           gap: 20px;
           flex-wrap: wrap;
         }
-
         .search-container {
           position: relative;
           flex: 1;
           max-width: 400px;
         }
-
         .search-icon {
           position: absolute;
           left: 15px;
@@ -396,7 +381,6 @@ const RepairHistoryPage = () => {
           transform: translateY(-50%);
           color: #94a3b8;
         }
-
         .search-input {
           width: 100%;
           padding: 12px 15px 12px 45px;
@@ -406,19 +390,16 @@ const RepairHistoryPage = () => {
           font-size: 14px;
           transition: all 0.2s;
         }
-
         .search-input:focus {
           outline: none;
           border-color: #3b82f6;
           background: white;
           box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
-
         .filter-tabs {
           display: flex;
           gap: 5px;
         }
-
         .filter-tab {
           background: none;
           border: none;
@@ -430,21 +411,17 @@ const RepairHistoryPage = () => {
           transition: all 0.2s;
           font-size: 0.9rem;
         }
-
         .filter-tab:hover {
           background: #f8fafc;
           color: #334155;
         }
-
         .filter-tab.active {
           background: #3b82f6;
           color: white;
         }
-
         .content-section {
           padding: 25px;
         }
-
         .loading-state,
         .empty-state {
           display: flex;
@@ -455,7 +432,6 @@ const RepairHistoryPage = () => {
           text-align: center;
           color: #64748b;
         }
-
         .loading-spinner {
           width: 32px;
           height: 32px;
@@ -465,23 +441,19 @@ const RepairHistoryPage = () => {
           animation: spin 1s linear infinite;
           margin-bottom: 20px;
         }
-
         .empty-icon {
           margin-bottom: 20px;
           opacity: 0.5;
         }
-
         .empty-state h3 {
           margin: 0 0 10px 0;
           color: #374151;
         }
-
         .history-list {
           display: flex;
           flex-direction: column;
           gap: 20px;
         }
-
         .history-card {
           background: white;
           border: 1px solid #e2e8f0;
@@ -489,26 +461,22 @@ const RepairHistoryPage = () => {
           overflow: hidden;
           transition: all 0.2s;
         }
-
         .history-card:hover {
           border-color: #cbd5e1;
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-
         .card-header {
           padding: 25px 25px 0;
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
         }
-
         .record-info h3 {
           margin: 0 0 8px 0;
           font-size: 1.2rem;
           font-weight: 600;
           color: #1e293b;
         }
-
         .record-meta {
           display: flex;
           align-items: center;
@@ -516,66 +484,55 @@ const RepairHistoryPage = () => {
           font-size: 0.85rem;
           color: #64748b;
         }
-
         .divider {
           color: #cbd5e1;
         }
-
         .status-section {
           display: flex;
           flex-direction: column;
           align-items: flex-end;
           gap: 8px;
         }
-
         .amount {
           font-size: 1.2rem;
           font-weight: 700;
           color: #059669;
         }
-
         .card-content {
           padding: 20px 25px;
         }
-
         .vehicle-info {
           margin-bottom: 20px;
           padding: 15px;
           background: #f8fafc;
           border-radius: 10px;
         }
-
         .vehicle-details {
           display: flex;
           gap: 20px;
           align-items: center;
         }
-
         .vehicle-name {
           font-weight: 600;
           color: #1e293b;
         }
-
         .registration,
         .mileage {
           font-size: 0.85rem;
           color: #64748b;
         }
-
         .services-list h4 {
           margin: 0 0 15px 0;
           font-size: 1rem;
           font-weight: 600;
           color: #374151;
         }
-
         .services-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
           gap: 10px;
           margin-bottom: 20px;
         }
-
         .service-item {
           display: flex;
           align-items: center;
@@ -583,12 +540,10 @@ const RepairHistoryPage = () => {
           font-size: 0.9rem;
           color: #374151;
         }
-
         .service-item svg {
           color: #10b981;
           flex-shrink: 0;
         }
-
         .record-details {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -597,41 +552,34 @@ const RepairHistoryPage = () => {
           padding-top: 20px;
           border-top: 1px solid #f1f5f9;
         }
-
         .detail-row {
           display: flex;
           justify-content: space-between;
           align-items: center;
         }
-
         .detail-label {
           font-size: 0.85rem;
           color: #64748b;
           font-weight: 500;
         }
-
         .detail-value {
           font-size: 0.85rem;
           color: #374151;
           font-weight: 600;
         }
-
         .detail-value.rating {
           display: flex;
           align-items: center;
           gap: 4px;
         }
-
         .detail-value.rating svg {
           color: #fbbf24;
         }
-
         .card-actions {
           padding: 20px 25px 25px;
           display: flex;
           gap: 12px;
         }
-
         .action-button {
           padding: 10px 16px;
           border-radius: 8px;
@@ -643,82 +591,66 @@ const RepairHistoryPage = () => {
           font-size: 0.9rem;
           transition: all 0.2s;
         }
-
         .action-button.secondary {
           background: #f8fafc;
           color: #64748b;
           border: 1px solid #e2e8f0;
         }
-
         .action-button.secondary:hover {
           background: #f1f5f9;
           border-color: #cbd5e1;
         }
-
         .action-button.primary {
           background: linear-gradient(135deg, #3b82f6, #2563eb);
           color: white;
           border: none;
         }
-
         .action-button.primary:hover {
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
-
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
-
         @media (max-width: 768px) {
           .page-header {
             flex-direction: column;
             align-items: flex-start;
             gap: 15px;
           }
-
           .header-stats {
             align-self: stretch;
             justify-content: space-around;
           }
-
           .controls-section {
             flex-direction: column;
             align-items: stretch;
           }
-
           .search-container {
             max-width: none;
           }
-
           .filter-tabs {
             justify-content: center;
           }
-
           .content-section {
             padding: 15px;
           }
-
           .card-header {
             flex-direction: column;
             gap: 15px;
           }
-
           .status-section {
             align-items: flex-start;
           }
-
           .vehicle-details {
             flex-direction: column;
             align-items: flex-start;
             gap: 8px;
           }
-
           .record-details {
             grid-template-columns: 1fr;
           }
-
           .card-actions {
             flex-direction: column;
           }
